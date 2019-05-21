@@ -15,6 +15,14 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "   FragColor = vertexColor;\n"
 "}\n\0";
 
+const char* fragmentShader1Source = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"uniform vec4 ourColor;\n"
+"void main()\n"
+"{\n"
+"   FragColor = ourColor;\n"
+"}\n\0";
+
 const char* fragmentShader2Source = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"

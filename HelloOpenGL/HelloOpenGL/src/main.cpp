@@ -3,8 +3,8 @@
 #include <iostream>
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1024;
+const unsigned int SCR_HEIGHT = 768;
 
 
 int main()
@@ -65,6 +65,12 @@ int main()
     glCompileShader(fragmentShaderYellow);
     Utility::CompileSucceed(fragmentShaderYellow); // check if succeed to compile
 
+    // fragment shader Uniform
+    unsigned int fragmentShaderUniform = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShaderUniform, 1, &fragmentShader1Source, nullptr);
+    glCompileShader(fragmentShaderUniform);
+    Utility::CompileSucceed(fragmentShaderUniform); // check if succeed to compile
+
     // shader program Orange
     unsigned int shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);         // link the first program object
@@ -81,10 +87,20 @@ int main()
     glLinkProgram(shaderProgramYellow);
     Utility::LinkSucceed(shaderProgramYellow); // check if succeed to link
 
+    // shader program Uniform
+    unsigned int shaderProgramUniform = glCreateProgram();
+    // then link the second program object using a different fragment shader (but same vertex shader)
+    // this is perfectly allowed since the inputs and outputs of both the vertex and fragment shaders are equally matched.
+    glAttachShader(shaderProgramUniform, vertexShader);
+    glAttachShader(shaderProgramUniform, fragmentShaderUniform);
+    glLinkProgram(shaderProgramUniform);
+    Utility::LinkSucceed(shaderProgramUniform); // check if succeed to link
+
     // delete the shader objects once we've linked them into the program object
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShaderOrange);
     glDeleteShader(fragmentShaderYellow);
+    glDeleteShader(fragmentShaderUniform);
 
     int id = 4;
     // draw a triangle
@@ -283,23 +299,27 @@ int main()
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
         float firstTriangle[] = {
-            // first triangle
             -0.5f, -0.5f, 0.0f,  // left
              0.5f, -0.5f, 0.0f,  // right
              0.0f,  0.5f, 0.0f   // top
         };
 
         float secondTriangle[] = {
-             // second triangle
              0.5f, -0.5f, 0.0f,
             -0.5f, -0.5f, 0.0f,
              0.0f, -1.0f, 0.0f
         };
 
+        float thirdTriangle[] = {
+            0.0f, 0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            1.0f, 0.5f, 0.0f
+        };
+
         // :: Initialization code, done once unless your object frequently changes
-        unsigned int VBOs[2], VAOs[2];
-        glGenVertexArrays(2, VAOs);  // we can also generate multiple VAOs or buffers at the same time
-        glGenBuffers(2, VBOs);
+        unsigned int VBOs[3], VAOs[3];
+        glGenVertexArrays(3, VAOs);  // we can also generate multiple VAOs or buffers at the same time
+        glGenBuffers(3, VBOs);
 
         // first triangle setup
         // --------------------
@@ -316,6 +336,14 @@ int main()
         glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // and a different VBO
         glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); // because the vertex data is tightly packed we can also specify 0 as the vertex attribute's stride to let OpenGL figure it out
+        glEnableVertexAttribArray(0);
+
+        // third triangle setup
+        // ---------------------
+        glBindVertexArray(VAOs[2]);             // note that we bind to a different VAO now
+        glBindBuffer(GL_ARRAY_BUFFER, VBOs[2]); // and a different VBO
+        glBufferData(GL_ARRAY_BUFFER, sizeof(thirdTriangle), thirdTriangle, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
         glEnableVertexAttribArray(0);
 
         //draw in wireframe mode
@@ -339,6 +367,17 @@ int main()
             glUseProgram(shaderProgramYellow);
             // then we draw the second triangle using the data from the second VAO
             glBindVertexArray(VAOs[1]);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+
+            glUseProgram(shaderProgramUniform);
+            //Update uniform color along with time change
+            float timeValue = glfwGetTime();
+            float greenValue = sin(timeValue) / 2.0f + 0.5f;
+            int vertexColorLocation = glGetUniformLocation(shaderProgramUniform, "ourColor");
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+            // then we draw the second triangle using the data from the second VAO
+            glBindVertexArray(VAOs[2]);
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
             glfwSwapBuffers(window);
