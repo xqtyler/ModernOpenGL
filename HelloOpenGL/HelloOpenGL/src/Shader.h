@@ -1,31 +1,33 @@
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"out vec4 vertexColor;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"   vertexColor = vec4(0.5, 0.0, 0.0, 1.0);\n"
-"}\0";
+#ifndef SHADER_H
+#define SHADER_H
 
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"in vec4 vertexColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vertexColor;\n"
-"}\n\0";
+#include <glad/glad.h> // include glad to get all the required OpenGL headers
 
-const char* fragmentShader1Source = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"uniform vec4 ourColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = ourColor;\n"
-"}\n\0";
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
-const char* fragmentShader2Source = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-"}\n\0";
+class Shader
+{
+public:
+    // constructor reads and builds the shader
+    Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+
+    // use/activate the shader
+    void Use();
+
+    // utility uniform functions
+    void SetBool(const std::string &name, bool value) const;
+    void SetInt(const std::string &name, int value) const;
+    void SetFloat(const std::string &name, float value) const;
+
+private:
+    void CheckCompileErrors(unsigned int shader, std::string type);
+
+private:
+    // the program ID
+    unsigned int m_shaderProgramId;
+};
+
+#endif

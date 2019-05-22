@@ -1,3 +1,6 @@
+#ifndef UTILITY_H
+#define UTILITY_H
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -7,4 +10,12 @@ namespace Utility {
     int CompileSucceed(unsigned int shaderOBj);
     int LinkSucceed(unsigned int shaderProgram);
 };
+
+namespace ShaderUtility {
+    void ShaderingOrange(GLFWwindow* window);
+    void ShaderingConnectedTriangle(GLFWwindow* window);
+    void ShaderingByCustomerizedShader(GLFWwindow* window);
+};
+
+#endif
 
