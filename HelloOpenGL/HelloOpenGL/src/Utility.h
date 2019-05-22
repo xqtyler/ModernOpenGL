@@ -14,6 +14,7 @@ namespace Utility {
 namespace ShaderUtility {
     void ShaderingOrange(GLFWwindow* window);
     void ShaderingConnectedTriangle(GLFWwindow* window);
+    void ShaderingUniform(GLFWwindow* window);
     void ShaderingByCustomerizedShader(GLFWwindow* window);
 };
 

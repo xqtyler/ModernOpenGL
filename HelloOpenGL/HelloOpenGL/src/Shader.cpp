@@ -40,22 +40,26 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 
     // 2. compile shaders
     unsigned int vertex, fragment;
+
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vShaderCode, NULL);
     glCompileShader(vertex);
     CheckCompileErrors(vertex, "VERTEX");
+
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &fShaderCode, NULL);
     glCompileShader(fragment);
     CheckCompileErrors(fragment, "FRAGMENT");
+
     // shader Program
     m_shaderProgramId = glCreateProgram();
     glAttachShader(m_shaderProgramId, vertex);
     glAttachShader(m_shaderProgramId, fragment);
     glLinkProgram(m_shaderProgramId);
     CheckCompileErrors(m_shaderProgramId, "PROGRAM");
+
     // delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertex);
     glDeleteShader(fragment);

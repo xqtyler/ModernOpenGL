@@ -142,12 +142,6 @@ void ShaderUtility::ShaderingConnectedTriangle(GLFWwindow* window)
     glCompileShader(vertexShader1);
     Utility::CompileSucceed(vertexShader1); // check if succeed to compile
 
-    //// fragment shader Orange
-    //unsigned int fragmentShaderOrange = glCreateShader(GL_FRAGMENT_SHADER);
-    //glShaderSource(fragmentShaderOrange, 1, &fragmentShaderSource, nullptr);
-    //glCompileShader(fragmentShaderOrange);
-    //Utility::CompileSucceed(fragmentShaderOrange); // check if succeed to compile
-
     // response to vertexShader1
     unsigned int fragmentShader1 = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader1, 1, &fragmentShader1Source, nullptr);
@@ -495,9 +489,94 @@ void ShaderUtility::ShaderingConnectedTriangle(GLFWwindow* window)
     }
 }
 
+void ShaderUtility::ShaderingUniform(GLFWwindow* window)
+{
+    // build and compile our shader program
+    // -----------------------------------------------------------------
+    // vertex shader without color passed in
+    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+    glCompileShader(vertexShader);
+    Utility::CompileSucceed(vertexShader); // check if succeed to compile
+
+    // fragment shader Uniform
+    unsigned int fragmentShaderUniform = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShaderUniform, 1, &fragmentShaderUniformSource, nullptr);
+    glCompileShader(fragmentShaderUniform);
+    Utility::CompileSucceed(fragmentShaderUniform); // check if succeed to compile
+
+    // shader program Uniform
+    unsigned int shaderProgramUniform = glCreateProgram();
+    // then link the second program object using a different fragment shader (but same vertex shader)
+    // this is perfectly allowed since the inputs and outputs of both the vertex and fragment shaders are equally matched.
+    glAttachShader(shaderProgramUniform, vertexShader);
+    glAttachShader(shaderProgramUniform, fragmentShaderUniform);
+    glLinkProgram(shaderProgramUniform);
+    Utility::LinkSucceed(shaderProgramUniform); // check if succeed to link
+
+    // delete the shader objects once we've linked them into the program object
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShaderUniform);
+
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
+    float vertices[] = {
+       -0.5f, -0.5f, 0.0f,  // left
+        0.5f, -0.5f, 0.0f,  // right
+        0.0f,  0.5f, 0.0f   // top
+    };
+
+    // :: Initialization code, done once unless your object frequently changes
+    unsigned int VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO); // 1. bind the Vertex Array Object first
+
+    // 2. then bind and set vertex buffer(s),
+    // copy vertices array in a buffer for OpenGL to use
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // 3. and then configure vertex attributes(s)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // render loop
+    while (!glfwWindowShouldClose(window)) // check if GLFW exits? if yes, close the windows
+    {
+        Utility::ProcessInput(window);
+
+        // render
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT); \
+
+        glUseProgram(shaderProgramUniform);
+        //Update uniform color along with time change
+        float timeValue = (float)glfwGetTime();
+        float greenValue = sin(timeValue) / 2.0f + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgramUniform, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+        glBindVertexArray(VAO);  // bind Vertex Array Object
+        glDrawArrays(GL_TRIANGLES, 0, 4);
+
+        glfwSwapBuffers(window);
+        //check if there are any IO events coming
+        glfwPollEvents();
+    }
+
+    // optional: de-allocate all resources once they've outlived their purpose:
+    // ------------------------------------------------------------------------
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+}
+
 void ShaderUtility::ShaderingByCustomerizedShader(GLFWwindow* window)
 {
-    Shader ourShader("./path/shader.vs", "./path/shader.fs");
+    Shader ourShader("./path/shader_practice_3.vs", "./path/shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -546,6 +625,7 @@ void ShaderUtility::ShaderingByCustomerizedShader(GLFWwindow* window)
 
         // render the triangle
         ourShader.Use();
+        //ourShader.SetFloat("xOffset", 0.5);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 

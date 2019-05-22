@@ -48,6 +48,7 @@ int main()
     std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 
     //ShaderUtility::ShaderingConnectedTriangle(window);
+    //ShaderUtility::ShaderingUniform(window);
     ShaderUtility::ShaderingByCustomerizedShader(window);
 
     // clear all previously allocated GLFW resources
