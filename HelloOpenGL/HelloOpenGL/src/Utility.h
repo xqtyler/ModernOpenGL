@@ -16,6 +16,8 @@ namespace ShaderUtility {
     void ShaderingConnectedTriangle(GLFWwindow* window);
     void ShaderingUniform(GLFWwindow* window);
     void ShaderingByCustomerizedShader(GLFWwindow* window);
+    void ShaderingTexture(GLFWwindow* window);
+    void ShaderingTextures(GLFWwindow* window);
 };
 
 #endif

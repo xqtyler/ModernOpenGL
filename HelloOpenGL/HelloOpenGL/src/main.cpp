@@ -1,6 +1,6 @@
+#include <iostream>
 #include "Shader.h"
 #include "Utility.h"
-#include <iostream>
 
 // settings
 const unsigned int SCR_WIDTH = 1024;
@@ -49,7 +49,8 @@ int main()
 
     //ShaderUtility::ShaderingConnectedTriangle(window);
     //ShaderUtility::ShaderingUniform(window);
-    ShaderUtility::ShaderingByCustomerizedShader(window);
+    //ShaderUtility::ShaderingByCustomerizedShader(window);
+    ShaderUtility::ShaderingTextures(window);
 
     // clear all previously allocated GLFW resources
     glfwTerminate();
